@@ -43,9 +43,6 @@
             'click #features input#activateWatchlist': 'connectTrakt',
             'click #unauthTrakt': 'disconnectTrakt',
             'click .closeTraktCode': 'disconnectTrakt',
-            'mousedown .createOpensubtitles': 'createOpensubtitles',
-            'click #authOpensubtitles': 'connectOpensubtitles',
-            'click #unauthOpensubtitles': 'disconnectOpensubtitles',
             'change #tmpLocation': 'updateCacheDirectory',
             'change #downloadsLocation': 'updateDownloadsDirectory',
             'click #syncTrakt': 'syncTrakt',
@@ -87,11 +84,6 @@
                 }
             });
 
-            // connect opensubs on enter
-            var osMousetrap = new Mousetrap(document.getElementById('opensubtitlesPassword'));
-            osMousetrap.bind('enter', function (e) {
-                this.connectOpensubtitles();
-            }.bind(this));
 
             if (!Settings.filters) {
                 $('.reset-current-filter').addClass('disabled').attr('data-original-title', '');
@@ -427,8 +419,10 @@
                     downloadsLocationChanged = true;
                     value = field.val();
                     break;
-                case 'opensubtitlesUsername':
-                case 'opensubtitlesPassword':
+                case 'subdlApiKey':
+                    value = field.val();
+                    AdvSettings.set(field.attr('name'), value);
+                    break;
                 case 'import-watched':
                 case 'import-bookmarks':
                 case 'import-torcol':
@@ -763,65 +757,6 @@
             }
         },
 
-        createOpensubtitles: function (e) {
-            Common.openOrClipboardLink(e, 'https://www.opensubtitles.org/newuser', 'link');
-        },
-
-        connectOpensubtitles: function (e) {
-            var self = this,
-                usn = $('#opensubtitlesUsername').val(),
-                pw = $('#opensubtitlesPassword').val(),
-                OS = require('opensubtitles-api');
-
-            var cross =  $('.opensubtitles-options .invalid-cross');
-            var spinner = $('.opensubtitles-options .loading-spinner');
-
-            cross.hide();
-
-            if (usn !== '' && pw !== '') {
-                spinner.show();
-                var OpenSubtitles = new OS({
-                    useragent: Settings.opensubtitles.useragent + ' v' + (Settings.version || 1),
-                    username: usn,
-                    password: Common.md5(pw),
-                    ssl: true
-                });
-                const delay = function(ms) {
-                  return new Promise(resolve => setTimeout(resolve, ms));
-                };
-                OpenSubtitles.login()
-                    .then(function (obj) {
-                        if (obj.token) {
-                            AdvSettings.set('opensubtitlesUsername', usn);
-                            AdvSettings.set('opensubtitlesPassword', Common.md5(pw));
-                            AdvSettings.set('opensubtitlesAuthenticated', true);
-                            spinner.hide();
-                            $('.opensubtitles-options .valid-tick').show();
-                            win.info('Setting changed: opensubtitlesAuthenticated - true');
-                            return new Promise(resolve => setTimeout(resolve, 1000));
-                        } else {
-                            throw new Error('no token returned by OpenSubtitles');
-                        }
-                    }).then(function () {
-                        self.render();
-                    }).catch(function (err) {
-                        win.error('OpenSubtitles.login()', err);
-                        spinner.hide();
-                    cross.show();
-                    });
-            } else {
-                cross.show();
-            }
-
-        },
-
-        disconnectOpensubtitles: function (e) {
-            var self = this;
-            AdvSettings.set('opensubtitlesUsername', '');
-            AdvSettings.set('opensubtitlesPassword', '');
-            AdvSettings.set('opensubtitlesAuthenticated', false);
-            setTimeout(self.render, 200);
-        },
 
         showFullDatalist: function(e) {
             if (e.button === 0 && (!e.detail || e.detail === 1)) {

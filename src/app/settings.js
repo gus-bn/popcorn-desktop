@@ -140,6 +140,7 @@ Settings.multipleExtSubtitles = false;
 Settings.opensubtitlesAuthenticated = false;
 Settings.opensubtitlesUsername = '';
 Settings.opensubtitlesPassword = '';
+Settings.subdlApiKey = '';
 Settings.playerSubPosition = '0px';
 
 // Playback

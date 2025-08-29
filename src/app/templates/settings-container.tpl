@@ -289,7 +289,6 @@
         <div class="title"><%= i18n.__("Subtitles") %></div>
         <div class="content">
             <div class="opensubtitles-options">
-                <% if (Settings.opensubtitlesAuthenticated) { %>
                     <span>
                         <div class="dropdown subtitles-language-default">
                             <p><%= i18n.__("Default Subtitle") %></p>
@@ -420,27 +419,13 @@
                         <label class="settings-label" for="multipleExtSubtitles"><%= i18n.__("Show all available subtitles for default language in flag menu") %></label>
                     </span>
                     <span>
-                        <em>* <%= i18n.__("You are currently connected to %s", "OpenSubtitles.org") %>.
-                        <a id="unauthOpensubtitles" class="unauthtext" href="#"><%= i18n.__("Disconnect account") %></a></em>
-                    </span>
-                <% } else { %>
-                    <span>
-                        <p><%= i18n.__("Username") %></p>
-                        <input type="text" size="50" id="opensubtitlesUsername" name="opensubtitlesUsername">
+                        <p><%= i18n.__("SubDL API Key") %></p>
+                        <input type="text" size="50" id="subdlApiKey" name="subdlApiKey" value="<%= Settings.subdlApiKey || '' %>" placeholder="Enter your SubDL API key">
                         <div class="loading-spinner" style="display: none"></div>
-                        <div class="valid-tick" style="display: none"></div>
-                        <div class="invalid-cross" style="display: none"></div>
                     </span>
                     <span>
-                        <p><%= i18n.__("Password") %></p>
-                        <input type="password" size="50" id="opensubtitlesPassword" name="opensubtitlesPassword" placeholder="* <%= i18n.__('Stored in local database as encrypted MD5 hash') %>"><br>
+                        <em>* <%= i18n.__("Get your API key from") %> <a href="https://subdl.com/api" target="_blank">SubDL.com</a> <%= i18n.__("to automatically fetch subtitles for movies and episodes") %></em>
                     </span>
-                    <span>
-                        <em>* <a class="syncOpensubtitles" id="authOpensubtitles" href="#"><%= i18n.__("Connect to %s", "OpenSubtitles.org") %></a>
-                        <%= i18n.__("to automatically fetch subtitles for movies and episodes you watch in %s", Settings.projectName) %>&nbsp;&nbsp;
-                        (<a class="createOpensubtitles" href="#"><%= i18n.__("Create an account") %></a>)</em>
-                    </span>
-                <% } %>
             </div>
         </div>
     </section>

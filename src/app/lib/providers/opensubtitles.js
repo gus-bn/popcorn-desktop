@@ -1,7 +1,6 @@
 (function (App) {
     'use strict';
-    var OS = require('opensubtitles-api'),
-        openSRT;
+    var fetch = require('node-fetch');
 
     var OpenSubtitles = function () {
 
@@ -58,15 +57,72 @@
     };
 
     OpenSubtitles.prototype.fetch = function (queryParams) {
-        openSRT = new OS({
-            useragent: 'Popcorn Time NodeJS',
-            username: AdvSettings.get('opensubtitlesUsername'),
-            password: AdvSettings.get('opensubtitlesPassword')
+        console.log('SubDL fetch called with:', queryParams);
+        
+        var apiKey = AdvSettings.get('subdlApiKey');
+        if (!apiKey) {
+            return Promise.reject(new Error('SubDL API key not configured'));
+        }
+        
+        var lang = AdvSettings.get('subtitle_language');
+        if (lang === 'none') {
+            lang = 'EN';
+        } else {
+            // Convert to uppercase for SubDL API
+            lang = lang.toUpperCase();
+        }
+        
+        var imdbId = queryParams.imdbid;
+        if (!imdbId) {
+            return Promise.reject(new Error('IMDB ID required for SubDL'));
+        }
+        
+        var url = 'https://api.subdl.com/api/v1/subtitles?api_key=' + apiKey + 
+                  '&imdb_id=' + imdbId + 
+                  '&languages=' + lang + 
+                  '&type=movie';
+        
+        console.log('SubDL API request:', url.replace(apiKey, '***'));
+        
+        return fetch(url, { 
+            headers: { 
+                'Accept': 'application/json' 
+            }
+        })
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+            console.log('SubDL API response:', data);
+            
+            if (!data.status || !data.results || !data.results.length || !data.subtitles || !data.subtitles.length) {
+                throw new Error('No subtitles found');
+            }
+            
+            var convertedData = {};
+            
+            data.subtitles.forEach(function(subtitle) {
+                var langCode = subtitle.language || 'en';
+                var zipUrl = 'https://dl.subdl.com' + subtitle.url;
+                
+                if (!convertedData[langCode]) {
+                    convertedData[langCode] = [];
+                }
+                
+                convertedData[langCode].push({
+                    url: zipUrl,
+                    langcode: langCode,
+                    downloads: subtitle.download_count || 0,
+                    score: subtitle.rating || 0
+                });
+            });
+            
+            return formatForButter(convertedData);
+        })
+        .catch(function(error) {
+            console.error('SubDL API error:', error);
+            throw error;
         });
-        queryParams.extensions = ['srt'];
-        queryParams.limit = 'all';
-        return openSRT.search(queryParams)
-            .then(formatForButter);
     };
 
     OpenSubtitles.prototype.detail = function (id, attrs) {
@@ -81,12 +137,8 @@
     };
 
     OpenSubtitles.prototype.upload = function (queryParams) {
-        openSRT = new OS({
-            useragent: 'Popcorn Time NodeJS',
-            username: AdvSettings.get('opensubtitlesUsername'),
-            password: AdvSettings.get('opensubtitlesPassword')
-        });
-        return openSRT.upload(queryParams);
+        // SubDL doesn't support uploading subtitles
+        return Promise.reject(new Error('Upload functionality is not available with SubDL'));
     };
 
     App.Providers.install(OpenSubtitles);

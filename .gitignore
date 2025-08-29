@@ -1,5 +1,6 @@
 # build files
 node_modules/
+tmp/
 src/app/themes
 build/
 cache/

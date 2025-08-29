@@ -29,7 +29,7 @@
   "window": {
     "title": "Popcorn Time",
     "icon": "src/app/images/icon.png",
-    "frame": false,
+    "frame": true,
     "toolbar": false,
     "min_width": 960,
     "min_height": 520,
@@ -76,7 +76,7 @@
     "mime": "^3.0.0",
     "nedb-promises": "^5.0.3",
     "node-tvdb": "^4.1.0",
-    "opensubtitles-api": "^5.1.2",
+    "node-fetch": "^2.6.7",
     "patch-package": "^8.0",
     "postinstall-postinstall": "^2.1.0",
     "readdirp": "2.x.x",

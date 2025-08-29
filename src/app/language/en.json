@@ -532,5 +532,8 @@
 	"2160p": "2160p",
 	"3D": "3D",
 	"The remote movies API failed to respond, please check %s and try again later": "The remote movies API failed to respond, please check %s and try again later",
-	"No watched items found...": "No watched items found..."
+	"No watched items found...": "No watched items found...",
+	"SubDL API Key": "SubDL API Key",
+	"Get your API key from": "Get your API key from",
+	"to automatically fetch subtitles for movies and episodes": "to automatically fetch subtitles for movies and episodes"
 }
