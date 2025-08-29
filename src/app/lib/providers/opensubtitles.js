@@ -77,12 +77,21 @@
             return Promise.reject(new Error('IMDB ID required for SubDL'));
         }
         
+        // Detect content type based on season/episode parameters
+        var isTV = queryParams.season && queryParams.episode;
+        var contentType = isTV ? 'tv' : 'movie';
+        
         var url = 'https://api.subdl.com/api/v1/subtitles?api_key=' + apiKey + 
                   '&imdb_id=' + imdbId + 
                   '&languages=' + lang + 
-                  '&type=movie';
+                  '&type=' + contentType;
         
-        console.log('SubDL API request:', url.replace(apiKey, '***'));
+        // Add season and episode for TV series
+        if (isTV) {
+            url += '&season_number=' + queryParams.season + '&episode_number=' + queryParams.episode;
+        }
+        
+        console.log('SubDL API request (' + contentType + '):', url.replace(apiKey, '***'));
         
         return fetch(url, { 
             headers: { 
